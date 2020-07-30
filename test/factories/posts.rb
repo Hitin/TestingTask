@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :post do
-    title { "MyString" }
-    body { "MyString" }
+    title
+    body
     userId { 1 }
   end
 end
