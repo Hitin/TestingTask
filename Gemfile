@@ -16,6 +16,7 @@ gem 'webpacker', '~> 4.0'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'bcrypt', '~> 3.1.7'
 gem 'jbuilder', '~> 2.7'
+gem 'haml-rails', '~> 2.0'
 gem 'simple_form'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
@@ -33,7 +34,6 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'factory_bot_rails'
   gem 'rubocop'
-
 end
 
 group :development do
