@@ -14,7 +14,9 @@ gem 'sass-rails', '>= 6'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 4.0'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'bcrypt', '~> 3.1.7'
 gem 'jbuilder', '~> 2.7'
+gem 'simple_form'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
@@ -33,8 +35,10 @@ end
 
 group :development do
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
+  gem 'factory_bot_rails'
   gem 'listen', '~> 3.2'
+  gem 'rubocop'
+  gem 'web-console', '>= 3.3.0'
 end
 
 group :test do
