@@ -1,0 +1,5 @@
+= simple_form_for @post, url: post_path(@post.id) do |f|
+  = f.input :title
+  = f.input :body
+  = f.input :userId, disabled: true, input_html: {value: 1}
+  = f.button :submit
