@@ -16,10 +16,11 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
         headers: {
-              'Accept'=>'*/*',
-              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     get posts_path, params: { force: 'true' }
     assert_response :success
@@ -36,10 +37,11 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
         headers: {
-              'Accept'=>'*/*',
-              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     get post_path(@post), params: { force: 'true' }
     assert_response :success
@@ -54,15 +56,16 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should post create Post good request' do
     post_attrs = attributes_for(:post)
-    stub_http_request(:post, "http://jsonplaceholder.typicode.com/posts").
+    stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
       with(
         body: post_attrs.to_json,
         headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type'=>'application/json; charset=UTF-8',
-          'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type' => 'application/json; charset=UTF-8',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 201, body: post_attrs.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
     assert_response :redirect
@@ -73,15 +76,16 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should post create Post bad request' do
     post_attrs = attributes_for(:post)
-    stub_http_request(:post, "http://jsonplaceholder.typicode.com/posts").
+    stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
       with(
         body: post_attrs.to_json,
         headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type'=>'application/json; charset=UTF-8',
-          'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type' => 'application/json; charset=UTF-8',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 404, body: post_attrs.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
     assert_response :success
@@ -103,11 +107,12 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
       with(
         body: attrs.to_json,
         headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type'=>'application/json; charset=UTF-8',
-          'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type' => 'application/json; charset=UTF-8',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 200, body: attrs.to_json, headers: {})
     put post_path(@post), params: { post: attrs }
     assert_response :redirect
@@ -120,10 +125,11 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_request(:delete, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
         headers: {
-              'Accept'=>'*/*',
-              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'User-Agent'=>'Ruby'
-        }).
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Ruby',
+        },
+      ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     delete post_path(@post)
     assert_response :redirect
