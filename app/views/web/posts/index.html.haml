@@ -1,3 +1,4 @@
+= @errors
 = link_to 'New Post', new_post_path, class: 'btn btn-info m-2'
 %table
   %tr
@@ -14,4 +15,5 @@
       %td= post.userId
       %td
         = link_to 'Edit', edit_post_path(post.id), class: 'btn btn-info m-1 btn-block'
+        = link_to 'Show', post_path(post.id), class: 'btn btn-info m-1 btn-block'
         = button_to 'Delete', post_path(post.id), method: :delete, class: 'btn btn-info'

@@ -5,14 +5,46 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     @post = create(:post)
   end
 
-  test 'should get index Posts' do
+  test 'should get index Posts without params' do
     get posts_path
     assert_response :success
   end
 
-  test 'should get show Posts' do
+  test 'should get index Posts with params force' do
+    @post2 = @post
+    @post2.title = generate(:title)
+    stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+      with(
+        headers: {
+              'Accept'=>'*/*',
+              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+              'User-Agent'=>'Ruby'
+        }).
+      to_return(status: 200, body: @post2.to_json, headers: {})
+    get posts_path, params: { force: 'true' }
+    assert_response :success
+  end
+
+  test 'should get show Posts without params' do
     get post_path(@post)
     assert_response :success
+  end
+
+  test 'should get show Posts with params' do
+    @post2 = @post
+    @post2.title = generate(:title)
+    stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+      with(
+        headers: {
+              'Accept'=>'*/*',
+              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+              'User-Agent'=>'Ruby'
+        }).
+      to_return(status: 200, body: @post2.to_json, headers: {})
+    get post_path(@post), params: { force: 'true' }
+    assert_response :success
+    @post.reload
+    assert_equal @post2.title, @post.title
   end
 
   test 'should get new' do
@@ -41,7 +73,6 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should post create Post bad request' do
     post_attrs = attributes_for(:post)
-    p post_attrs.to_json
     stub_http_request(:post, "http://jsonplaceholder.typicode.com/posts").
       with(
         body: post_attrs.to_json,
@@ -59,13 +90,6 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     assert_nil post_find
   end
 
-  test 'should delete destroy Post' do
-    delete post_path(@post)
-    assert_response :redirect
-
-    assert_not Post.exists?(@post.id)
-  end
-
   test 'should get edit Post' do
     get edit_post_path(@post)
     assert_response :success
@@ -74,11 +98,36 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should put update Post' do
     attrs = {}
     attrs[:title] = generate(:title)
-
+    uri = "http://jsonplaceholder.typicode.com/posts/#{@post.id}"
+    stub_http_request(:put, uri).
+      with(
+        body: attrs.to_json,
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type'=>'application/json; charset=UTF-8',
+          'User-Agent'=>'Ruby'
+        }).
+      to_return(status: 200, body: attrs.to_json, headers: {})
     put post_path(@post), params: { post: attrs }
     assert_response :redirect
 
     @post.reload
     assert_equal attrs[:title], @post.title
+  end
+
+  test 'should delete destroy Post' do
+    stub_request(:delete, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+      with(
+        headers: {
+              'Accept'=>'*/*',
+              'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+              'User-Agent'=>'Ruby'
+        }).
+      to_return(status: 200, body: @post2.to_json, headers: {})
+    delete post_path(@post)
+    assert_response :redirect
+
+    assert_not Post.exists?(@post.id)
   end
 end
