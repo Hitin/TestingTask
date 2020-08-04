@@ -37,7 +37,7 @@ class Web::PostsController < ApplicationController
         render(action: :new)
       end
     else
-      @errors << response.message
+      @errors << "Id #{@post.id} - #{response.message}"
       render(action: :new)
     end
   end
@@ -48,11 +48,12 @@ class Web::PostsController < ApplicationController
 
   def update
     @post = Post.find(params[:id])
+    @errors = []
     if @post.update(post_attrs)
       uri = "http://jsonplaceholder.typicode.com/posts/#{@post.id}"
       response = change_service(uri, post_attrs, 'Put')
       if response.code != '200'
-        @errors = response.message
+        @errors << "Id #{@post.id} - #{response.message}"
       end
       redirect_to(post_path(@post))
     else
@@ -76,7 +77,7 @@ class Web::PostsController < ApplicationController
     if response.code == '200'
       post.update(JSON.parse(response.body))
     else
-      @errors << response.message
+      @errors << "Id #{post.id} - #{response.message}"
     end
     post
   end

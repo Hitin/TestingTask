@@ -3,6 +3,11 @@ require 'test_helper'
 class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @post = create(:post)
+    @headers = {
+      'Accept' => '*/*',
+      'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+      'User-Agent' => 'Ruby',
+    }
   end
 
   test 'should get index Posts without params' do
@@ -15,11 +20,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     @post2.title = generate(:title)
     stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     get posts_path, params: { force: 'true' }
@@ -36,11 +37,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     @post2.title = generate(:title)
     stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     get post_path(@post), params: { force: 'true' }
@@ -59,12 +56,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
       with(
         body: post_attrs.to_json,
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type' => 'application/json; charset=UTF-8',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 201, body: post_attrs.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
@@ -79,12 +71,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
       with(
         body: post_attrs.to_json,
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type' => 'application/json; charset=UTF-8',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 404, body: post_attrs.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
@@ -106,12 +93,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
     stub_http_request(:put, uri).
       with(
         body: attrs.to_json,
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type' => 'application/json; charset=UTF-8',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 200, body: attrs.to_json, headers: {})
     put post_path(@post), params: { post: attrs }
@@ -124,11 +106,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should delete destroy Post' do
     stub_request(:delete, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
       with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Ruby',
-        },
+        headers: @headers
       ).
       to_return(status: 200, body: @post2.to_json, headers: {})
     delete post_path(@post)
