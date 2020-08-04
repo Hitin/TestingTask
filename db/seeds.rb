@@ -5,3 +5,9 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+count = 1
+while count <= 5 do
+  Post.create(title: "Title1#{count}", body: "Body#{count}", userId: '1')
+  count += 1
+end
