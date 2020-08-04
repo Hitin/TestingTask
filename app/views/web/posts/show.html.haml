@@ -1,4 +1,6 @@
 %h1= "Show"
+= link_to 'Force update', post_path(@post.id, force: 'true'), class: 'btn btn-info m-1 btn-block'
+
 = render 'error_messages', object: @errors
 %b Title
 = @post.title
