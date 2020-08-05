@@ -1,14 +1,14 @@
 = render 'error_messages', object: @errors
 = link_to 'New Post', new_post_path, class: 'btn btn-info m-2'
-- if !@posts.empty?
+- if @posts.present?
   %b= link_to 'Force Posts', posts_path(force: 'true')
 %table
   %tr
-    %th= 'Id'
-    %th= 'Title'
-    %th= 'Body'
-    %th= 'UserID'
-    %th= 'Actions'
+    %th Id
+    %th Title
+    %th Body
+    %th UserID
+    %th Actions
   - @posts.each do |post|
     %tr
       %td= post.id
