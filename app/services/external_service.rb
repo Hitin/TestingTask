@@ -8,7 +8,7 @@ module ExternalService
       res = http.request(req)
       res
     end
-  
+
     def change_service(url, attrs, method)
       uri = URI(url)
       headers = { 'Content-Type' => 'application/json; charset=UTF-8' }
@@ -18,6 +18,11 @@ module ExternalService
       req.body = attrs.to_json
       res = http.request(req)
       res
+    end
+
+    def replace_key(hash, new, old)
+      hash[new] = hash.delete(old)
+      hash
     end
   end
 end
