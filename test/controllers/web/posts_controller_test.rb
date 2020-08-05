@@ -16,13 +16,12 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should get index Posts with params force' do
-    @post2 = @post
-    @post2.title = generate(:title)
-    stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+    response = { title: generate(:title), body: @post.body, userId: '1' }
+    stub_request(:get, "#{Rails.configuration.external_api_url}/#{@post.id}").
       with(
-        headers: @headers
+        headers: @headers,
       ).
-      to_return(status: 200, body: @post2.to_json, headers: {})
+      to_return(status: 200, body: response.to_json, headers: {})
     get posts_path, params: { force: 'true' }
     assert_response :success
   end
@@ -33,17 +32,17 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should get show Posts with params' do
-    @post2 = @post
-    @post2.title = generate(:title)
-    stub_request(:get, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+    response = { title: generate(:title), body: @post.body, userId: '1' }
+
+    stub_request(:get, "#{Rails.configuration.external_api_url}/#{@post.id}").
       with(
-        headers: @headers
+        headers: @headers,
       ).
-      to_return(status: 200, body: @post2.to_json, headers: {})
+      to_return(status: 200, body: response.to_json, headers: {})
     get post_path(@post), params: { force: 'true' }
     assert_response :success
     @post.reload
-    assert_equal @post2.title, @post.title
+    assert_equal response[:title], @post.title
   end
 
   test 'should get new' do
@@ -53,12 +52,15 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should post create Post good request' do
     post_attrs = attributes_for(:post)
-    stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
+    post_attrs_service = post_attrs.clone
+    post_attrs_service = ExternalService.replace_key(post_attrs_service, :userId, :user_id)
+
+    stub_http_request(:post, Rails.configuration.external_api_url).
       with(
-        body: post_attrs.to_json,
-        headers: @headers
+        body: post_attrs_service.to_json,
+        headers: @headers,
       ).
-      to_return(status: 201, body: post_attrs.to_json, headers: {})
+      to_return(status: 201, body: post_attrs_service.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
     assert_response :redirect
 
@@ -68,12 +70,15 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should post create Post bad request' do
     post_attrs = attributes_for(:post)
-    stub_http_request(:post, 'http://jsonplaceholder.typicode.com/posts').
+    post_attrs_service = post_attrs.clone
+    post_attrs_service = ExternalService.replace_key(post_attrs_service, :userId, :user_id)
+
+    stub_http_request(:post, Rails.configuration.external_api_url).
       with(
-        body: post_attrs.to_json,
-        headers: @headers
+        body: post_attrs_service.to_json,
+        headers: @headers,
       ).
-      to_return(status: 404, body: post_attrs.to_json, headers: {})
+      to_return(status: 404, body: post_attrs_service.to_json, headers: {})
     post posts_path, params: { post: post_attrs }
     assert_response :success
 
@@ -89,11 +94,11 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should put update Post' do
     attrs = {}
     attrs[:title] = generate(:title)
-    uri = "http://jsonplaceholder.typicode.com/posts/#{@post.id}"
+    uri = "#{Rails.configuration.external_api_url}/#{@post.id}"
     stub_http_request(:put, uri).
       with(
         body: attrs.to_json,
-        headers: @headers
+        headers: @headers,
       ).
       to_return(status: 200, body: attrs.to_json, headers: {})
     put post_path(@post), params: { post: attrs }
@@ -104,11 +109,11 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should delete destroy Post' do
-    stub_request(:delete, "http://jsonplaceholder.typicode.com/posts/#{@post.id}").
+    stub_request(:delete, "#{Rails.configuration.external_api_url}/#{@post.id}").
       with(
-        headers: @headers
+        headers: @headers,
       ).
-      to_return(status: 200, body: @post2.to_json, headers: {})
+      to_return(status: 200, body: "", headers: {})
     delete post_path(@post)
     assert_response :redirect
 
