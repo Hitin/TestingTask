@@ -26,8 +26,9 @@ class Web::PostsController < ApplicationController
   end
 
   def create
-    response = ExternalService.change_service(Rails.configuration.external_api_url, post_attrs, 'Post')
-    post_new = JSON.parse(response.body)
+    attrs = replace_key(post_attrs, 'userId', 'user_id')
+    response = ExternalService.change_service(Rails.configuration.external_api_url, attrs, 'Post')
+    post_new = replace_key(JSON.parse(response.body), 'user_id', 'userId')
     @post = Post.new(post_new)
     if response.code == '201'
       if @post.save
@@ -73,7 +74,8 @@ class Web::PostsController < ApplicationController
     uri = "#{Rails.configuration.external_api_url}/#{post.id}"
     response = ExternalService.service(uri, 'Get')
     if response.code == '200'
-      post.update(JSON.parse(response.body))
+      post_new = replace_key(JSON.parse(response.body), 'user_id', 'userId')
+      post.update(post_new)
     else
       add_errors(post.id, response.message)
     end
@@ -86,7 +88,12 @@ class Web::PostsController < ApplicationController
     @errors << "Id #{id} - #{message}"
   end
 
+  def replace_key(hash, new, old)
+    hash[new] = hash.delete old
+    hash
+  end
+
   def post_attrs
-    params.require(:post).permit(:title, :body, :userId)
+    params.require(:post).permit(:title, :body, :user_id, :userId)
   end
 end

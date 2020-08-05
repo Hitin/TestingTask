@@ -14,7 +14,7 @@
       %td= post.id
       %td= post.title
       %td= post.body
-      %td= post.userId
+      %td= post.user_id
       %td
         = link_to 'Edit', edit_post_path(post.id), class: 'btn btn-info m-1 btn-block'
         = link_to 'Show', post_path(post.id), class: 'btn btn-info m-1 btn-block'
