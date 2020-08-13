@@ -53,7 +53,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should post create Post good request' do
     post_attrs = attributes_for(:post)
     post_attrs_service = post_attrs.clone
-    post_attrs_service = ExternalService.replace_key(post_attrs_service, :userId, :user_id)
+    post_attrs_service = CrudService.replace_key(post_attrs_service, :userId, :user_id)
 
     stub_http_request(:post, Rails.configuration.external_api_url).
       with(
@@ -71,7 +71,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should post create Post bad request' do
     post_attrs = attributes_for(:post)
     post_attrs_service = post_attrs.clone
-    post_attrs_service = ExternalService.replace_key(post_attrs_service, :userId, :user_id)
+    post_attrs_service = CrudService.replace_key(post_attrs_service, :userId, :user_id)
 
     stub_http_request(:post, Rails.configuration.external_api_url).
       with(

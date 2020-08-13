@@ -5,12 +5,12 @@ class Web::PostsController < ApplicationController
 
   def index
     @posts = Post.all
-    arr = []
+    list_posts = []
     if params[:force] == 'true'
       @posts.find_each do |post|
-        arr << force_update(post)
+        list_posts << force_update(post)
       end
-      @posts = arr
+      @posts = list_posts
     end
   end
 
@@ -26,10 +26,9 @@ class Web::PostsController < ApplicationController
   end
 
   def create
-    attrs = ExternalService.replace_key(post_attrs, 'userId', 'user_id')
-    response = ExternalService.change_service(Rails.configuration.external_api_url, attrs, 'Post')
-    post_new = ExternalService.replace_key(JSON.parse(response.body), 'user_id', 'userId')
-    @post = Post.new(post_new)
+    attrs = CrudService.replace_key(post_attrs, 'userId', 'user_id')
+    response = CrudService.create_post(attrs)
+    @post = Post.new(post_attrs)
     if response.code == '201'
       if @post.save
         redirect_to(posts_path)
@@ -49,8 +48,7 @@ class Web::PostsController < ApplicationController
   def update
     @post = Post.find(params[:id])
     if @post.update(post_attrs)
-      uri = "#{Rails.configuration.external_api_url}/#{@post.id}"
-      response = ExternalService.change_service(uri, post_attrs, 'Put')
+      response = CrudService.update_post(post_attrs, @post.id)
       if response.code != '200'
         add_errors(@post.id, response.message)
       end
@@ -63,18 +61,16 @@ class Web::PostsController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     @post.destroy
-    uri = "#{Rails.configuration.external_api_url}/#{@post.id}"
-    ExternalService.service(uri, 'Delete')
+    CrudService.delete_post(@post.id)
     redirect_to(posts_path)
   end
 
   private
 
   def force_update(post)
-    uri = "#{Rails.configuration.external_api_url}/#{post.id}"
-    response = ExternalService.service(uri, 'Get')
+    response = CrudService.get_post(post.id)
     if response.code == '200'
-      post_new = ExternalService.replace_key(JSON.parse(response.body), 'user_id', 'userId')
+      post_new = CrudService.replace_key(JSON.parse(response.body), 'user_id', 'userId')
       post.update(post_new)
     else
       add_errors(post.id, response.message)
@@ -87,6 +83,6 @@ class Web::PostsController < ApplicationController
   end
 
   def post_attrs
-    params.require(:post).permit(:title, :body, :user_id, :userId)
+    params.require(:post).permit(:title, :body, :user_id)
   end
 end
