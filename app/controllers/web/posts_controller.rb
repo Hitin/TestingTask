@@ -29,15 +29,17 @@ class Web::PostsController < ApplicationController
     attrs = CrudService.replace_key(post_attrs, 'userId', 'user_id')
     response = CrudService.create_post(attrs)
     @post = Post.new(post_attrs)
-    if response.code == '201'
-      if @post.save
-        redirect_to(posts_path)
+    if check_response?(response)
+      if response.code == '201'
+        if @post.save
+          redirect_to(posts_path)
+        else
+          render(action: :new)
+        end
       else
+        add_errors(@post.id, response.message)
         render(action: :new)
       end
-    else
-      add_errors(@post.id, response.message)
-      render(action: :new)
     end
   end
 
@@ -49,10 +51,12 @@ class Web::PostsController < ApplicationController
     @post = Post.find(params[:id])
     if @post.update(post_attrs)
       response = CrudService.update_post(post_attrs, @post.id)
-      if response.code != '200'
-        add_errors(@post.id, response.message)
+      if check_response?(response)
+        if response.code != '200'
+          add_errors(@post.id, response.message)
+        end
+        redirect_to(post_path(@post))
       end
-      redirect_to(post_path(@post))
     else
       render(action: :edit)
     end
@@ -69,13 +73,24 @@ class Web::PostsController < ApplicationController
 
   def force_update(post)
     response = CrudService.get_post(post.id)
-    if response.code == '200'
-      post_new = CrudService.replace_key(JSON.parse(response.body), 'user_id', 'userId')
-      post.update(post_new)
-    else
-      add_errors(post.id, response.message)
+    if check_response?(response)
+      if response.code == '200'
+        post_new = CrudService.replace_key(JSON.parse(response.body), 'user_id', 'userId')
+        post.update(post_new)
+      else
+        add_errors(post.id, response.message)
+      end
     end
     post
+  end
+
+  def check_response?(response)
+    if response
+      true
+    else 
+      @errors << 'Error request'
+      false
+    end
   end
 
   def add_errors(id, message)

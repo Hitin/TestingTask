@@ -17,13 +17,15 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get index Posts with params force' do
     response = { title: generate(:title), body: @post.body, userId: '1' }
-    stub_request(:get, "#{Rails.configuration.external_api_url}/#{@post.id}").
+    stub_request(:get, CrudService.current_url(@post.id)).
       with(
         headers: @headers,
       ).
       to_return(status: 200, body: response.to_json, headers: {})
     get posts_path, params: { force: 'true' }
     assert_response :success
+    @post.reload
+    assert_equal response[:title], @post.title
   end
 
   test 'should get show Posts without params' do
@@ -34,7 +36,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should get show Posts with params' do
     response = { title: generate(:title), body: @post.body, userId: '1' }
 
-    stub_request(:get, "#{Rails.configuration.external_api_url}/#{@post.id}").
+    stub_request(:get, CrudService.current_url(@post.id)).
       with(
         headers: @headers,
       ).
@@ -94,7 +96,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should put update Post' do
     attrs = {}
     attrs[:title] = generate(:title)
-    uri = "#{Rails.configuration.external_api_url}/#{@post.id}"
+    uri = CrudService.current_url(@post.id)
     stub_http_request(:put, uri).
       with(
         body: attrs.to_json,
@@ -109,7 +111,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should delete destroy Post' do
-    stub_request(:delete, "#{Rails.configuration.external_api_url}/#{@post.id}").
+    stub_request(:delete, CrudService.current_url(@post.id)).
       with(
         headers: @headers,
       ).

@@ -5,7 +5,7 @@ module CrudService
     end
     
     def get_post(id)
-      request_service(id, 'Get')
+      request_service(current_url(id), 'Get')
     end
 
     def update_post(attrs, id)
@@ -13,31 +13,40 @@ module CrudService
     end
 
     def delete_post(id)
-      request_service(id, 'Delete')
+      request_service(current_url(id), 'Delete')
     end
 
-    def request_service(id, method)
-      uri = URI(current_url(id))
-      http = Net::HTTP.new(uri.host)
-      method = "Net::HTTP::#{method}".constantize
-      req = method.new(uri.path)
-      res = http.request(req)
-      res
+    def request_service(uri, method)
+      begin 
+        uri = URI(uri)
+        http = Net::HTTP.new(uri.host)
+          method = "Net::HTTP::#{method}".constantize
+          req = method.new(uri.path)
+          res = http.request(req)
+          res
+      rescue => e
+        logger_error(e)
+      end
     end
 
     def change_service(url, attrs, method)
-      uri = URI(url)
-      headers = { 'Content-Type' => 'application/json; charset=UTF-8' }
-      http = Net::HTTP.new(uri.host)
-      if good_method?(method)
+      begin
+        uri = URI(url)
+        headers = { 'Content-Type' => 'application/json; charset=UTF-8' }
+        http = Net::HTTP.new(uri.host)
         method = "Net::HTTP::#{method.capitalize}".constantize
         req = method.new(uri.path, headers)
         req.body = attrs.to_json
         res = http.request(req)
         res
-      else
-        res =  ''
+      rescue => e
+        logger_error(e)
       end
+    end
+
+    def logger_error(e)
+      Rails.logger.error { "#{e.message} #{e.backtrace.join("\n")}" }
+      nil
     end
 
     def good_method?(method)
