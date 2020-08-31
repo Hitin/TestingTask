@@ -1,0 +1,13 @@
+%h1 Show
+= link_to 'Force update', post_path(@post.id, force: 'true'), class: 'btn btn-info m-1 btn-block'
+
+= render 'error_messages', object: @errors
+%b Title
+= @post.title
+%br
+%b Body 
+= @post.body
+%br
+%br
+= link_to 'All posts', posts_path
+= link_to 'Edit', edit_post_path(@post)
