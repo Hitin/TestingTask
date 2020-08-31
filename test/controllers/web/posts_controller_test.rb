@@ -17,11 +17,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get index Posts with params force' do
     response = { title: generate(:title), body: @post.body, userId: '1' }
-    stub_request(:get, CrudService.current_url(@post.id)).
-      with(
-        headers: @headers,
-      ).
-      to_return(status: 200, body: response.to_json, headers: {})
+    testing_request('get').to_return(status: 200, body: response.to_json, headers: {})
     get posts_path, params: { force: 'true' }
     assert_response :success
     @post.reload
@@ -36,11 +32,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should get show Posts with params' do
     response = { title: generate(:title), body: @post.body, userId: '1' }
 
-    stub_request(:get, CrudService.current_url(@post.id)).
-      with(
-        headers: @headers,
-      ).
-      to_return(status: 200, body: response.to_json, headers: {})
+    testing_request('get').to_return(status: 200, body: response.to_json, headers: {})
     get post_path(@post), params: { force: 'true' }
     assert_response :success
     @post.reload
@@ -55,7 +47,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should post create Post good request' do
     post_attrs = attributes_for(:post)
     post_attrs_service = post_attrs.clone
-    post_attrs_service = CrudService.replace_key(post_attrs_service, :userId, :user_id)
+    post_attrs_service = PostService.replace_key(post_attrs_service, :userId, :user_id)
 
     stub_http_request(:post, Rails.configuration.external_api_url).
       with(
@@ -73,9 +65,9 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should post create Post bad request' do
     post_attrs = attributes_for(:post)
     post_attrs_service = post_attrs.clone
-    post_attrs_service = CrudService.replace_key(post_attrs_service, :userId, :user_id)
+    post_attrs_service = PostService.replace_key(post_attrs_service, :userId, :user_id)
 
-    stub_http_request(:post, Rails.configuration.external_api_url).
+    stub_request(:post, Rails.configuration.external_api_url).
       with(
         body: post_attrs_service.to_json,
         headers: @headers,
@@ -96,8 +88,7 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   test 'should put update Post' do
     attrs = {}
     attrs[:title] = generate(:title)
-    uri = CrudService.current_url(@post.id)
-    stub_http_request(:put, uri).
+    stub_http_request(:put, PostService.current_url(@post.id)).
       with(
         body: attrs.to_json,
         headers: @headers,
@@ -111,14 +102,27 @@ class Web::PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should delete destroy Post' do
-    stub_request(:delete, CrudService.current_url(@post.id)).
-      with(
-        headers: @headers,
-      ).
-      to_return(status: 200, body: "", headers: {})
+    testing_request('delete').to_return(status: 200, body: '', headers: {})
     delete post_path(@post)
     assert_response :redirect
 
     assert_not Post.exists?(@post.id)
+  end
+
+  private
+
+  def incorrect_method(method)
+    p(['Incorrect method: ', method].join)
+  end
+
+  def testing_request(method)
+    if PostService.permitted_method?(method)
+      stub_request(method.to_sym, PostService.current_url(@post.id)).
+        with(
+          headers: @headers,
+        )
+    else
+      incorrect_method(method)
+    end
   end
 end
